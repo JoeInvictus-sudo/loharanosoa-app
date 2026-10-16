@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import LoginForm from "@/components/LoginForm";
 
 export const metadata: Metadata = {
   title: "Connexion",
@@ -76,9 +77,8 @@ export default function LoginPage() {
           }}
         />
 
-        {/* Logo + Titre — CENTRÉS */}
+        {/* Logo + Titre */}
         <div style={{ marginBottom: "40px" }}>
-          {/* Logo 3D — L + Étoile */}
           <div
             style={{
               position: "relative",
@@ -107,7 +107,6 @@ export default function LoginPage() {
             >
               L
             </div>
-            {/* Étoile ambre */}
             <svg
               style={{
                 position: "absolute",
@@ -149,97 +148,8 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Formulaire */}
-        <form style={{ display: "flex", flexDirection: "column", gap: "20px", textAlign: "left" }}>
-          {/* Email */}
-          <div>
-            <label
-              htmlFor="email"
-              style={{
-                display: "block",
-                fontSize: "12px",
-                fontWeight: "600",
-                color: "#475569",
-                marginBottom: "8px",
-              }}
-            >
-              Adresse email
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="exemple@loharanosoa.mg"
-              style={{
-                width: "100%",
-                padding: "14px 18px",
-                background: "#FAFAFA",
-                border: "1.5px solid #E2E8F0",
-                borderRadius: "14px",
-                fontSize: "14px",
-                color: "#0F172A",
-                outline: "none",
-                boxSizing: "border-box",
-                fontFamily: "inherit",
-              }}
-              required
-            />
-          </div>
-
-          {/* Mot de passe */}
-          <div>
-            <label
-              htmlFor="password"
-              style={{
-                display: "block",
-                fontSize: "12px",
-                fontWeight: "600",
-                color: "#475569",
-                marginBottom: "8px",
-              }}
-            >
-              Mot de passe
-            </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••••"
-              style={{
-                width: "100%",
-                padding: "14px 18px",
-                background: "#FAFAFA",
-                border: "1.5px solid #E2E8F0",
-                borderRadius: "14px",
-                fontSize: "14px",
-                color: "#0F172A",
-                outline: "none",
-                boxSizing: "border-box",
-                fontFamily: "inherit",
-              }}
-              required
-            />
-          </div>
-
-          {/* Bouton */}
-          <button
-            type="submit"
-            style={{
-              width: "100%",
-              padding: "16px",
-              background: "linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)",
-              color: "white",
-              fontWeight: "600",
-              fontSize: "14px",
-              borderRadius: "14px",
-              border: "none",
-              cursor: "pointer",
-              boxShadow: "0 8px 20px rgba(79,70,229,0.28)",
-              fontFamily: "inherit",
-              marginTop: "8px",
-            }}
-          >
-            Se connecter
-          </button>
-        </form>
+        {/* Formulaire connecté à Supabase */}
+        <LoginForm />
 
         {/* Lien mot de passe oublié */}
         <p
