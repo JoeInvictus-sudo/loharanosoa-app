@@ -1,26 +1,121 @@
 @import "tailwindcss";
 
+/* ============================================
+   PALETTE LOHARANOSOA — Design Premium
+   ============================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Couleurs principales */
+  --background: #FFFFFF;
+  --background-soft: #FAFAFA;
+  --background-mute: #F1F5F9;
+
+  /* Brand (Bleu nuit) */
+  --brand: #0F172A;
+  --brand-soft: #1E293B;
+  --brand-hover: #334155;
+
+  /* Action (Indigo) */
+  --indigo: #4F46E5;
+  --indigo-dark: #4338CA;
+  --indigo-light: #EEF2FF;
+
+  /* Accent (Ambre doré) */
+  --amber: #F59E0B;
+  --amber-dark: #D97706;
+  --amber-light: #FEF3C7;
+
+  /* États */
+  --emerald: #10B981;
+  --emerald-light: #D1FAE5;
+  --coral: #EF4444;
+  --coral-light: #FEE2E2;
+
+  /* Texte */
+  --text: #0F172A;
+  --text-soft: #475569;
+  --text-muted: #94A3B8;
+
+  /* Bordures */
+  --border: #E2E8F0;
+  --border-soft: #F1F5F9;
 }
+
+/* ============================================
+   TAILWIND THEME (v4)
+   ============================================ */
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background-soft: var(--background-soft);
+  --color-background-mute: var(--background-mute);
+
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-hover: var(--brand-hover);
+
+  --color-indigo: var(--indigo);
+  --color-indigo-dark: var(--indigo-dark);
+  --color-indigo-light: var(--indigo-light);
+
+  --color-amber: var(--amber);
+  --color-amber-dark: var(--amber-dark);
+  --color-amber-light: var(--amber-light);
+
+  --color-emerald: var(--emerald);
+  --color-emerald-light: var(--emerald-light);
+  --color-coral: var(--coral);
+  --color-coral-light: var(--coral-light);
+
+  --color-text: var(--text);
+  --color-text-soft: var(--text-soft);
+  --color-text-muted: var(--text-muted);
+
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================
+   STYLES DE BASE
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--background-soft);
+  color: var(--text);
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+}
+
+/* Scrollbar premium */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
