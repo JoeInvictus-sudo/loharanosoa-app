@@ -1,6 +1,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import Topbar from "@/components/Topbar";
+import AddStudentButton from "@/components/AddStudentButton";
 
 export default async function ElevesPage() {
   const supabase = await createServerSupabaseClient();
@@ -38,10 +39,19 @@ export default async function ElevesPage() {
       />
 
       <div style={{ padding: "32px 36px" }}>
-        <div style={{ marginBottom: "24px" }}>
+        {/* En-tête avec bouton */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "24px",
+          }}
+        >
           <h2 style={{ fontSize: "20px", fontWeight: "700", color: "#0F172A", margin: 0 }}>
             Liste des élèves
           </h2>
+          <AddStudentButton />
         </div>
 
         {/* Message si pas encore d'élèves */}
