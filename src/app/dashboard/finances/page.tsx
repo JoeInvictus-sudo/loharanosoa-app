@@ -13,7 +13,6 @@ export default async function FinancesPage() {
     redirect("/");
   }
 
-  // Récupérer le profil
   const { data: profile } = await supabase
     .from("profiles")
     .select("*")
@@ -23,32 +22,20 @@ export default async function FinancesPage() {
   const userName = `${profile?.prenom ?? ""} ${profile?.nom ?? ""}`.trim() || "Utilisateur";
   const userRole = profile?.role ?? "utilisateur";
 
-  // Récupérer l'historique des paiements (avec les infos de l'élève et de sa classe)
   const { data: paiements } = await supabase
     .from("paiements")
     .select(`
-      id,
-      mois,
-      montant,
-      methode,
-      date_paiement,
-      eleves (
-        nom,
-        prenom,
-        matricule,
-        classes ( nom )
-      )
+      id, mois, montant, methode, date_paiement,
+      eleves ( nom, prenom, matricule, classes ( nom ) )
     `)
-    .order("date_paiement", { ascending: false }); // Le plus récent en haut
+    .order("date_paiement", { ascending: false });
 
-  // Formatage
   function formatAriary(value: number) {
     return new Intl.NumberFormat("fr-FR").format(value) + " Ar";
   }
 
   function formatDate(dateString: string) {
     if (!dateString) return "—";
-    // Formate la date au format JJ/MM/AAAA
     return new Date(dateString).toLocaleDateString("fr-FR");
   }
 
@@ -62,7 +49,6 @@ export default async function FinancesPage() {
       />
 
       <div style={{ padding: "32px 36px" }}>
-        {/* En-tête avec bouton */}
         <div
           style={{
             display: "flex",
@@ -82,15 +68,11 @@ export default async function FinancesPage() {
           <AddPaymentButton />
         </div>
 
-        {/* Liste des paiements */}
         {(!paiements || paiements.length === 0) ? (
           <div
             style={{
-              background: "white",
-              borderRadius: "20px",
-              padding: "60px 40px",
-              textAlign: "center",
-              border: "1px solid #F1F5F9",
+              background: "white", borderRadius: "20px", padding: "60px 40px",
+              textAlign: "center", border: "1px solid #F1F5F9",
             }}
           >
             <p style={{ fontSize: "16px", fontWeight: "600", color: "#0F172A" }}>
@@ -103,10 +85,7 @@ export default async function FinancesPage() {
         ) : (
           <div
             style={{
-              background: "white",
-              borderRadius: "20px",
-              border: "1px solid #F1F5F9",
-              overflow: "hidden",
+              background: "white", borderRadius: "20px", border: "1px solid #F1F5F9", overflow: "hidden",
             }}
           >
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -116,14 +95,14 @@ export default async function FinancesPage() {
                   <th style={{ textAlign: "left", padding: "16px 22px", fontSize: "11px", fontWeight: "700", color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.8px" }}>Classe</th>
                   <th style={{ textAlign: "left", padding: "16px 22px", fontSize: "11px", fontWeight: "700", color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.8px" }}>Mois payé</th>
                   <th style={{ textAlign: "left", padding: "16px 22px", fontSize: "11px", fontWeight: "700", color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.8px" }}>Montant</th>
-                  <th style={{ textAlign: "left", padding: "16px 22px", fontSize: "11px", fontWeight: "700", color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.8px" }}>Date de saisie</th>
+                  <th style={{ textAlign: "left", padding: "16px 22px", fontSize: "11px", fontWeight: "700", color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.8px" }}>Date</th>
+                  <th style={{ textAlign: "right", padding: "16px 22px", fontSize: "11px", fontWeight: "700", color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.8px" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {paiements.map((p) => {
-                  // On extrait l'élève (au cas où Supabase le renvoie sous forme de tableau)
-                  const eleve = Array.isArray(p.eleves) ? p.eleves[0] : p.eleves;
-                  // On extrait la classe (qui est imbriquée dans l'élève)
+                  // On force le type pour TypeScript
+                  const eleve = (Array.isArray(p.eleves) ? p.eleves[0] : p.eleves) as any;
                   const classe = eleve && Array.isArray(eleve.classes) ? eleve.classes[0] : eleve?.classes;
 
                   return (
@@ -147,6 +126,20 @@ export default async function FinancesPage() {
                       </td>
                       <td style={{ padding: "16px 22px", fontSize: "13.5px", color: "#475569" }}>
                         {formatDate(p.date_paiement)}
+                      </td>
+                      <td style={{ padding: "16px 22px", textAlign: "right" }}>
+                        <a
+                          href={`/dashboard/finances/recu/${p.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            padding: "6px 12px", background: "#EEF2FF", color: "#4F46E5",
+                            textDecoration: "none", borderRadius: "8px", fontSize: "12px",
+                            fontWeight: "600", display: "inline-block",
+                          }}
+                        >
+                          Reçu
+                        </a>
                       </td>
                     </tr>
                   );
