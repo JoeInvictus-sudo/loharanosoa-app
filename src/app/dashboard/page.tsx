@@ -2,6 +2,8 @@ import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import Topbar from "@/components/Topbar";
 import StatCard from "@/components/StatCard";
+import RevenueChart from "@/components/RevenueChart";
+import RevenueDonut from "@/components/RevenueDonut";
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient();
@@ -79,23 +81,55 @@ export default async function DashboardPage() {
           />
         </div>
 
-        {/* Placeholder pour les graphiques */}
-        <div
-          style={{
-            background: "white",
-            padding: "40px",
-            borderRadius: "20px",
-            border: "1px solid #F1F5F9",
-            textAlign: "center",
-          }}
-        >
-          <p style={{ fontSize: "16px", fontWeight: "600", color: "#0F172A" }}>
-            🚧 Graphiques et listes à venir
-          </p>
-          <p style={{ fontSize: "13px", color: "#94A3B8", marginTop: "8px" }}>
-            Le graphique courbes, le donut, la liste des impayés et l'activité récente arrivent à la prochaine étape.
-          </p>
-        </div>
+        {/* Graphiques */}
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "1.8fr 1fr",
+    gap: "22px",
+    marginBottom: "22px",
+  }}
+>
+  {/* Graphique courbes */}
+  <div
+    style={{
+      background: "white",
+      borderRadius: "20px",
+      padding: "26px",
+      border: "1px solid #F1F5F9",
+    }}
+  >
+    <div style={{ marginBottom: "20px" }}>
+      <h3 style={{ fontSize: "15px", fontWeight: "700", color: "#0F172A", margin: 0 }}>
+        Revenus vs Dépenses
+      </h3>
+      <p style={{ fontSize: "12px", color: "#94A3B8", marginTop: "3px" }}>
+        Comparaison sur 10 mois — Année 2026-2027
+      </p>
+    </div>
+    <RevenueChart />
+  </div>
+
+  {/* Donut */}
+  <div
+    style={{
+      background: "white",
+      borderRadius: "20px",
+      padding: "26px",
+      border: "1px solid #F1F5F9",
+    }}
+  >
+    <div style={{ marginBottom: "20px" }}>
+      <h3 style={{ fontSize: "15px", fontWeight: "700", color: "#0F172A", margin: 0 }}>
+        Répartition du mois
+      </h3>
+      <p style={{ fontSize: "12px", color: "#94A3B8", marginTop: "3px" }}>
+        Octobre 2026
+      </p>
+    </div>
+    <RevenueDonut />
+  </div>
+</div>
       </div>
     </>
   );
