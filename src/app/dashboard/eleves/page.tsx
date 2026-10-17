@@ -25,11 +25,12 @@ export default async function ElevesPage() {
   const userRole = profile?.role ?? "utilisateur";
 
   // Récupérer les élèves
-  const { data: eleves } = await supabase
-    .from("eleves")
-    .select("id, matricule, nom, prenom, statut, classe_id")
-    .order("nom", { ascending: true });
+const { data: eleves } = await supabase
+  .from("eleves")
+  .select("id, matricule, nom, prenom, statut, classe_id, date_naissance, sexe, parent_nom, parent_telephone, parent_email")
+  .order("nom", { ascending: true });
 
+  
   // Récupérer les classes
   const { data: classes } = await supabase
     .from("classes")
