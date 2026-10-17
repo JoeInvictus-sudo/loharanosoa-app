@@ -4,6 +4,8 @@ import Topbar from "@/components/Topbar";
 import StatCard from "@/components/StatCard";
 import RevenueChart from "@/components/RevenueChart";
 import RevenueDonut from "@/components/RevenueDonut";
+import LateStudents from "@/components/LateStudents";
+import RecentActivity from "@/components/RecentActivity";
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient();
@@ -91,14 +93,14 @@ export default async function DashboardPage() {
   }}
 >
   {/* Graphique courbes */}
-  <div
+    <div
     style={{
       background: "white",
       borderRadius: "20px",
       padding: "26px",
       border: "1px solid #F1F5F9",
     }}
-  >
+    >
     <div style={{ marginBottom: "20px" }}>
       <h3 style={{ fontSize: "15px", fontWeight: "700", color: "#0F172A", margin: 0 }}>
         Revenus vs Dépenses
@@ -129,6 +131,18 @@ export default async function DashboardPage() {
     </div>
     <RevenueDonut />
   </div>
+</div>
+
+{/* Impayés + Activité */}
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "22px",
+  }}
+>
+  <LateStudents />
+  <RecentActivity />
 </div>
       </div>
     </>
