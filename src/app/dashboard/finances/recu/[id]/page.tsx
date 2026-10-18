@@ -12,27 +12,50 @@ export default async function RecuPage({ params }: { params: Promise<{ id: strin
   }
 
   const resolvedParams = await params;
-  const { data: paiement } = await supabase
+
+  // 1. Récupérer le paiement cliqué (pour avoir les infos de l'élève et la date exacte)
+  const { data: paiementInitial } = await supabase
     .from("paiements")
     .select(`
-      id, mois, montant, methode, date_paiement,
-      eleves ( nom, prenom, matricule, classes ( nom ) ),
+      id, created_at,
+      eleves ( id, nom, prenom, matricule, classes ( nom ) ),
       annees_scolaires ( libelle )
     `)
     .eq("id", resolvedParams.id)
     .single();
 
-  if (!paiement) {
+  if (!paiementInitial) {
     notFound();
   }
 
-  // On force le type pour TypeScript
-  const eleve = (Array.isArray(paiement.eleves) ? paiement.eleves[0] : paiement.eleves) as any;
-  const classe = eleve && Array.isArray(eleve.classes) ? eleve.classes[0] : eleve?.classes;
-  const annee = Array.isArray(paiement.annees_scolaires) ? paiement.annees_scolaires[0] : paiement.annees_scolaires;
+  // On force le type pour l'élève
+  const eleveInfo = (Array.isArray(paiementInitial.eleves) ? paiementInitial.eleves[0] : paiementInitial.eleves) as any;
+  const eleveId = eleveInfo?.id;
 
-  const montantFormat = new Intl.NumberFormat("fr-FR").format(paiement.montant) + " Ar";
-  const dateFormat = new Date(paiement.date_paiement).toLocaleDateString("fr-FR");
+  // 2. Récupérer TOUS les paiements de cet élève faits à la même seconde (pour le reçu groupé)
+  // On compare la date de création (qui est un timestamp)
+  const { data: paiementsGroupe } = await supabase
+    .from("paiements")
+    .select("id, mois, montant, methode, date_paiement")
+    .eq("eleve_id", eleveId)
+    .eq("created_at", paiementInitial.created_at); 
+
+  // 3. Préparer les infos d'affichage
+  const eleve = eleveInfo;
+  const classe = eleve && Array.isArray(eleve.classes) ? eleve.classes[0] : eleve?.classes;
+  const annee = Array.isArray(paiementInitial.annees_scolaires) ? paiementInitial.annees_scolaires[0] : paiementInitial.annees_scolaires;
+  
+  // Calcul du total du reçu
+  const totalRecu = paiementsGroupe?.reduce((sum, p) => sum + p.montant, 0) ?? 0;
+  const dateFormat = new Date(paiementInitial.created_at).toLocaleDateString("fr-FR");
+  const heureFormat = new Date(paiementInitial.created_at).toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' });
+  
+  // Numéro de reçu basé sur l'ID du premier paiement
+  const numRecu = paiementInitial.id.slice(0, 8).toUpperCase();
+  
+  function formatAriary(value: number) {
+    return new Intl.NumberFormat("fr-FR").format(value) + " Ar";
+  }
 
   return (
     <div style={{ padding: "40px", fontFamily: "Inter, sans-serif", background: "#FAFAFA", minHeight: "100vh", display: "flex", justifyContent: "center" }}>
@@ -46,7 +69,7 @@ export default async function RecuPage({ params }: { params: Promise<{ id: strin
           </div>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: "12px", color: "#64748B", textTransform: "uppercase", fontWeight: "600" }}>N° Reçu</div>
-            <div style={{ fontSize: "14px", fontWeight: "700", color: "#0F172A" }}>{paiement.id.slice(0, 8).toUpperCase()}</div>
+            <div style={{ fontSize: "14px", fontWeight: "700", color: "#0F172A" }}>{numRecu}</div>
           </div>
         </div>
 
@@ -59,7 +82,7 @@ export default async function RecuPage({ params }: { params: Promise<{ id: strin
           <div style={{ fontSize: "14px", color: "#475569" }}>Année scolaire : {annee?.libelle || "—"}</div>
         </div>
 
-        {/* Détails paiement */}
+        {/* Détails paiements (Tableau multi-lignes) */}
         <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "30px" }}>
           <thead>
             <tr style={{ background: "#F8FAFC", borderTop: "1px solid #E2E8F0", borderBottom: "1px solid #E2E8F0" }}>
@@ -68,18 +91,23 @@ export default async function RecuPage({ params }: { params: Promise<{ id: strin
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td style={{ padding: "16px 12px", fontSize: "14px", color: "#0F172A", borderBottom: "1px solid #E2E8F0" }}>
-                Frais de scolarité — Mois de <strong>{paiement.mois}</strong>
-              </td>
-              <td style={{ padding: "16px 12px", fontSize: "14px", fontWeight: "600", color: "#0F172A", textAlign: "right", borderBottom: "1px solid #E2E8F0" }}>
-                {montantFormat}
-              </td>
-            </tr>
+            {/* On boucle sur les paiements du groupe pour afficher chaque ligne */}
+            {paiementsGroupe?.map((p) => (
+              <tr key={p.id}>
+                <td style={{ padding: "16px 12px", fontSize: "14px", color: "#0F172A", borderBottom: "1px solid #E2E8F0" }}>
+                  {p.mois === "Inscription" 
+                    ? "Frais d'inscription (Généraux, Carnet, FRAM)" 
+                    : `Frais de scolarité — Mois de ${p.mois}`}
+                </td>
+                <td style={{ padding: "16px 12px", fontSize: "14px", fontWeight: "600", color: "#0F172A", textAlign: "right", borderBottom: "1px solid #E2E8F0" }}>
+                  {formatAriary(p.montant)}
+                </td>
+              </tr>
+            ))}
             <tr>
               <td style={{ padding: "16px 12px", fontSize: "14px", fontWeight: "700", color: "#0F172A", textAlign: "right" }}>TOTAL PAYÉ</td>
               <td style={{ padding: "16px 12px", fontSize: "16px", fontWeight: "800", color: "#10B981", textAlign: "right" }}>
-                {montantFormat}
+                {formatAriary(totalRecu)}
               </td>
             </tr>
           </tbody>
@@ -88,8 +116,8 @@ export default async function RecuPage({ params }: { params: Promise<{ id: strin
         {/* Pied de page */}
         <div style={{ borderTop: "2px solid #E2E8F0", paddingTop: "20px", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
           <div>
-            <div style={{ fontSize: "12px", color: "#64748B" }}>Méthode : <strong style={{ textTransform: "capitalize" }}>{paiement.methode}</strong></div>
-            <div style={{ fontSize: "12px", color: "#64748B", marginTop: "4px" }}>Date : <strong>{dateFormat}</strong></div>
+            <div style={{ fontSize: "12px", color: "#64748B" }}>Méthode : <strong style={{ textTransform: "capitalize" }}>{paiementsGroupe?.[0]?.methode}</strong></div>
+            <div style={{ fontSize: "12px", color: "#64748B", marginTop: "4px" }}>Date : <strong>{dateFormat} à {heureFormat}</strong></div>
           </div>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: "12px", color: "#64748B", marginBottom: "4px" }}>Signature et cachet</div>

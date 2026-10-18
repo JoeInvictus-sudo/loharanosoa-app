@@ -27,7 +27,7 @@ export default async function ElevesPage() {
   // Récupérer les élèves
 const { data: eleves } = await supabase
   .from("eleves")
-  .select("id, matricule, nom, prenom, statut, classe_id, date_naissance, sexe, parent_nom, parent_telephone, parent_email")
+  .select("id, matricule, nom, prenom, statut, classe_id, date_naissance, lieu_naissance, sexe, pere_nom, mere_nom, parent_telephone, adresse")
   .order("nom", { ascending: true });
 
   

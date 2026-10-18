@@ -13,10 +13,12 @@ interface Eleve {
   statut: string;
   classe_id: string | null;
   date_naissance: string | null;
+  lieu_naissance: string | null;
   sexe: string | null;
-  parent_nom: string | null;
+  pere_nom: string | null;
+  mere_nom: string | null;
   parent_telephone: string | null;
-  parent_email: string | null;
+  adresse: string | null;
 }
 
 interface Classe {
